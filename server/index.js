@@ -85,30 +85,20 @@ async function notifyLead(lead) {
     return;
   }
 
-  const subject = `New lead: ${lead.first_name} ${lead.last_name} (${lead.interest || "general"})`;
+  const subject = "New Lead for FunAsia Smart Reach Campaign";
 
   const rows = [
-    ["Name",                 `${lead.first_name} ${lead.last_name}`],
-    ["Email",                lead.email],
-    ["Phone",                lead.phone || "—"],
-    ["Interest",             lead.interest || "—"],
-    ["Message",              lead.message || "—"],
-    ["IP address",           lead.ip_address || "—"],
-    ["Referrer",             lead.referrer || "—"],
-    ["Landing page",         lead.landing_page || "—"],
-    ["UTM source",           lead.utm_source || "—"],
-    ["UTM medium",           lead.utm_medium || "—"],
-    ["UTM campaign",         lead.utm_campaign || "—"],
-    ["UTM content",          lead.utm_content || "—"],
-    ["UTM term",             lead.utm_term || "—"],
-    ["StackAdapt click ID",  lead.sa_click_id || "—"],
-    ["User agent",           lead.user_agent || "—"]
+    ["Name",      `${lead.first_name} ${lead.last_name}`],
+    ["Email",     lead.email],
+    ["Phone",     lead.phone || "—"],
+    ["Interest",  lead.interest || "—"],
+    ["Message",   lead.message || "—"]
   ];
 
   const text = rows.map(function (r) { return r[0] + ": " + r[1]; }).join("\n");
   const html =
     '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:640px;">' +
-    '<h2 style="font-family:Georgia,serif;font-weight:400;color:#0A1F44;margin:0 0 8px;">New lead on agfintax.com</h2>' +
+    '<h2 style="font-family:Georgia,serif;font-weight:400;color:#0A1F44;margin:0 0 8px;">New Lead — FunAsia Smart Reach</h2>' +
     '<p style="color:#666;margin:0 0 24px;font-size:14px;">A visitor submitted the contact form. Details below.</p>' +
     '<table style="border-collapse:collapse;width:100%;font-size:14px;">' +
     rows.map(function (r) {
