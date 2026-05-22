@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const rateLimit = require("express-rate-limit");
 const admin = require("firebase-admin");
 
 const PORT = process.env.PORT || 8080;
@@ -43,7 +44,10 @@ const db = admin.firestore();
 const FieldValue = admin.firestore.FieldValue;
 
 const app = express();
-app.set("trust proxy", true); // Render sits behind a proxy; needed for real client IP
+// Render sits behind exactly one reverse proxy (their edge). Trusting only 1
+// hop gives us the real client IP via X-Forwarded-For while preventing
+// attackers from spoofing earlier hops to bypass IP-based rate limiting.
+app.set("trust proxy", 1);
 app.use(express.json({ limit: "32kb" }));
 
 app.use(cors({
@@ -145,9 +149,36 @@ async function notifyLead(lead) {
   }
 }
 
+// ─── Rate limiters ───────────────────────────────────────────────────────────
+// Per-IP windows. Render terminates TLS in front of us, and we've already set
+// 'trust proxy' so req.ip reflects the real client IP from X-Forwarded-For.
+// In-memory store — fine for a single Render instance. If the API ever
+// horizontally scales, swap this for a Redis store (rate-limit-redis).
+const leadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,  // 1 hour
+  limit: 5,                   // 5 lead submissions per IP per hour
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { ok: false, error: "Too many submissions from this IP. Please try again later or call us at (469) 942-9888." },
+  handler: function (req, res, next, options) {
+    console.warn("[ratelimit] lead blocked from", req.ip);
+    res.status(options.statusCode).json(options.message);
+  }
+});
+
+const trackLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,  // 1 hour
+  limit: 60,                  // 60 pageview pings per IP per hour
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { ok: false, error: "Too many requests." },
+  // Don't log every blocked pageview — noisy. Only log every 10th.
+  skip: function () { return false; }
+});
+
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
-app.post("/api/track", async (req, res) => {
+app.post("/api/track", trackLimiter, async (req, res) => {
   const b = req.body || {};
   const doc = {
     created_at:   FieldValue.serverTimestamp(),
@@ -173,7 +204,7 @@ app.post("/api/track", async (req, res) => {
   }
 });
 
-app.post("/api/lead", async (req, res) => {
+app.post("/api/lead", leadLimiter, async (req, res) => {
   const b = req.body || {};
 
   if (b.hp_check_xv) {
