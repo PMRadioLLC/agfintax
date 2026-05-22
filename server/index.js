@@ -37,12 +37,22 @@ app.use(express.json({ limit: "32kb" }));
 
 app.use(cors({
   origin: function (origin, cb) {
-    if (!origin) return cb(null, true); // same-origin / curl / server-to-server
-    if (ALLOWED_ORIGIN.length === 0) return cb(null, true); // permissive if unconfigured
+    // No origin header → same-origin request, curl, or server-to-server. Allow.
+    if (!origin) return cb(null, true);
+    // No allowed list configured → permissive (logged at boot below).
+    if (ALLOWED_ORIGIN.length === 0) return cb(null, true);
+    // Exact match against the configured allow-list.
     if (ALLOWED_ORIGIN.includes(origin)) return cb(null, true);
-    return cb(new Error("Origin not allowed: " + origin));
+    // Reject WITHOUT throwing — throwing makes Express return 500 on the
+    // preflight, which masks the real cause. Returning false makes the
+    // middleware send a clean rejection that the browser surfaces as a CORS
+    // error, and we log the mismatch so it's debuggable from Render logs.
+    console.warn("[cors] rejecting origin:", origin, "— configured ALLOWED_ORIGIN:", ALLOWED_ORIGIN);
+    return cb(null, false);
   }
 }));
+
+console.log("[boot] ALLOWED_ORIGIN =", ALLOWED_ORIGIN.length ? ALLOWED_ORIGIN : "(empty — permissive mode)");
 
 function clientIp(req) {
   const ip = req.ip || req.connection?.remoteAddress || null;
