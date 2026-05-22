@@ -85,8 +85,9 @@ app.post("/api/track", async (req, res) => {
 app.post("/api/lead", async (req, res) => {
   const b = req.body || {};
 
-  if (b.website) {
+  if (b.hp_check_xv) {
     // honeypot tripped — pretend success, do not store
+    console.log("[lead] honeypot tripped; dropping payload");
     return res.json({ ok: true });
   }
 

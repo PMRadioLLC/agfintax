@@ -97,10 +97,6 @@
       var errEl = form.querySelector("#form-error");
       errEl.style.display = "none";
 
-      // honeypot
-      var hp = form.querySelector('input[name="website"]');
-      if (hp && hp.value) { setSubmitted(form); return; }
-
       var fd = new FormData(form);
       var data = {
         first_name: (fd.get("first_name") || "").toString().trim(),
@@ -109,6 +105,7 @@
         phone:      (fd.get("phone")      || "").toString().trim() || null,
         interest:   (fd.get("interest")   || "").toString(),
         message:    (fd.get("message")    || "").toString().trim() || null,
+        hp_check_xv: (fd.get("hp_check_xv") || "").toString(),
         user_agent: navigator.userAgent,
         referrer:   document.referrer || null,
         landing_page: attribution.landing_page || null,

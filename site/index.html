@@ -676,10 +676,11 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
         </div>
       </div>
 
-      <!-- Honeypot anti-spam field, hidden from real users -->
+      <!-- Honeypot anti-spam field, hidden from real users. The field name
+           is intentionally obscure so browser autofill won't populate it. -->
       <div aria-hidden="true" style="position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;">
-        <label for="f-website">Website</label>
-        <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        <label for="f-hp-check">Leave this blank</label>
+        <input id="f-hp-check" name="hp_check_xv" type="text" tabindex="-1" autocomplete="off" />
       </div>
 
       <div id="form-error" class="form-error" style="display:none;"></div>
