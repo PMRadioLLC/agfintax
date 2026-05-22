@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AG FinTax — Strategic tax planning for ambitious owners and families</title>
+<meta name="description" content="AG FinTax helps high-net-worth families, founders, and growing businesses legally reduce their tax burden with year-round strategy." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+
+<!-- Runtime config: API base URL is rewritten at deploy time or via env -->
+<script>
+  window.AGFT_CONFIG = {
+    apiBase: "" /* same-origin /api by default; set to "https://api.example.com" if API is on a different host */
+  };
+</script>
+
+<!-- StackAdapt universal pixel (site-wide). Fires on every pageview.
+     The conversion event fires from app.js → window.saConversion() after a
+     successful form submit. -->
+<script>!function(s,a,e,v,n,t,z){if(s.saq)return;n=s.saq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!s._saq)s._saq=n;
+n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;t.src=v;z=a.getElementsByTagName(e)[0];z.parentNode.insertBefore(t,z)}(window,document,'script','https://tags.srv.stackadapt.com/events.js');saq('ts', 'Y1kc0SZIajJ0e7K0jtwhpw');</script>
+
+<style>
+  :root {
+    --paper:        #FBFAF7;
+    --paper-warm:   #F3EFE6;
+    --paper-edge:   #ECE6D8;
+    --ink:          #0A1F44;
+    --ink-soft:     #1B2D54;
+    --gold:         #C9A14A;
+    --gold-soft:    #E0BE74;
+    --orange:       #E8732C;
+    --mute:         rgba(10,31,68,0.62);
+    --rule:         rgba(10,31,68,0.14);
+    --serif:        'Source Serif 4', 'Source Serif Pro', Georgia, serif;
+    --sans:         'Manrope', -apple-system, system-ui, sans-serif;
+    --mono:         'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    color: var(--ink);
+    background: var(--paper);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(10,31,68,0.035) 1px, transparent 0);
+    background-size: 4px 4px;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+
+  .wrap {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  @media (min-width: 720px) { .wrap { padding: 0 40px; } }
+  @media (min-width: 1024px) { .wrap { padding: 0 56px; } }
+
+  /* Wordmark */
+  .logo { display: inline-flex; align-items: center; gap: 10px; }
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-row {
+    font-family: var(--serif); font-weight: 600; font-size: 22px;
+    letter-spacing: -0.01em; display: flex; align-items: baseline; gap: 2px;
+  }
+  .logo-ag { color: var(--orange); }
+  .logo-finTax { color: var(--ink); }
+  .logo-tagline {
+    font-family: var(--sans); font-size: 8.5px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--mute); margin-top: 5px; font-weight: 500;
+  }
+  .logo-mark {
+    width: 30px; height: 30px; border: 1.5px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-style: italic; font-size: 14px;
+    color: var(--ink); background: var(--paper);
+  }
+
+  /* Top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251,250,247,0.85);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 76px; gap: 24px;
+  }
+  .nav-links { display: none; gap: 32px; font-size: 14px; color: var(--ink-soft); }
+  .nav-links a { transition: color .15s; }
+  .nav-links a:hover { color: var(--orange); }
+  @media (min-width: 900px) { .nav-links { display: flex; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em; border: none;
+    transition: transform .15s, background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--orange); }
+  .btn-ghost {
+    background: transparent; color: var(--ink);
+    padding: 12px 18px; border-bottom: 1px solid var(--ink);
+    padding-left: 0; padding-right: 0;
+  }
+  .btn-large { padding: 16px 28px; font-size: 14px; }
+  .btn-gold { background: var(--gold); color: var(--ink); }
+  .btn-gold:hover { background: var(--gold-soft); }
+  .btn[disabled] { opacity: 0.7; cursor: default; }
+
+  .btn .arrow {
+    font-family: var(--serif); font-style: italic; font-size: 18px;
+    line-height: 1; transition: transform .2s;
+  }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* Meta label */
+  .meta-label {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--mute);
+  }
+  .meta-label::before {
+    content: ""; width: 6px; height: 6px; background: var(--gold); border-radius: 50%;
+  }
+
+  /* Hero */
+  .hero { padding: 56px 0 64px; position: relative; }
+  @media (min-width: 720px) { .hero { padding: 72px 0 88px; } }
+  @media (min-width: 1024px) { .hero { padding: 88px 0 120px; } }
+
+  .hero-grid { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+  @media (min-width: 1024px) {
+    .hero-grid { grid-template-columns: 1.15fr 1fr; gap: 72px; }
+  }
+
+  .display {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(44px, 7vw, 88px); line-height: 1.02;
+    letter-spacing: -0.02em; margin: 24px 0 0; color: var(--ink);
+    text-wrap: balance;
+  }
+  .display em { font-style: italic; color: var(--ink-soft); }
+  .display .accent { color: var(--orange); font-style: italic; }
+
+  .hero-sub {
+    font-size: clamp(16px, 1.5vw, 18px); line-height: 1.55;
+    color: var(--mute); max-width: 540px; margin: 28px 0 0;
+  }
+
+  .hero-actions {
+    margin-top: 36px; display: flex; flex-wrap: wrap;
+    gap: 14px 28px; align-items: center;
+  }
+
+  .hero-trust {
+    margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--rule);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+  }
+  .trust-stat { line-height: 1; }
+  .trust-stat .n {
+    font-family: var(--serif); font-size: clamp(28px, 3.4vw, 38px);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .trust-stat .l {
+    margin-top: 10px; font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--mute); line-height: 1.4;
+  }
+
+  /* hero image well */
+  .hero-image {
+    position: relative; aspect-ratio: 4 / 5; width: 100%;
+    max-width: 520px; justify-self: center;
+  }
+  @media (min-width: 1024px) { .hero-image { max-width: 100%; } }
+  .hero-image .hero-img {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    background: var(--paper-warm); border: 1px solid var(--rule);
+    object-fit: cover;
+  }
+  .hero-tag {
+    position: absolute; left: -16px; bottom: 28px;
+    background: var(--paper); border: 1px solid var(--rule);
+    padding: 14px 18px; max-width: 240px;
+    box-shadow: 0 14px 40px -20px rgba(10,31,68,0.30);
+  }
+  @media (min-width: 720px) { .hero-tag { left: -28px; } }
+  .hero-tag-label {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--mute); margin-bottom: 6px;
+  }
+  .hero-tag-name { font-family: var(--serif); font-size: 20px; line-height: 1.1; color: var(--ink); }
+  .hero-tag-name em { font-style: italic; color: var(--orange); font-weight: 500; }
+
+  .hero-serial {
+    position: absolute; top: 14px; right: 14px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em;
+    color: var(--paper); background: rgba(10,31,68,0.55); padding: 5px 9px;
+  }
+
+  /* Press strip */
+  .press {
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule);
+    padding: 22px 0; background: rgba(243,239,230,0.45);
+  }
+  .press-inner { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 48px; }
+  .press-label {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--mute);
+  }
+  .press-items { display: flex; flex-wrap: wrap; gap: 28px 44px; align-items: center; }
+  .press-name {
+    font-family: var(--serif); font-size: clamp(18px, 1.8vw, 22px);
+    letter-spacing: -0.01em; color: var(--ink); opacity: 0.55;
+  }
+
+  /* Services */
+  .services { padding: 88px 0 96px; position: relative; }
+  @media (min-width: 1024px) { .services { padding: 128px 0 136px; } }
+
+  .section-head {
+    display: grid; grid-template-columns: 1fr; gap: 28px; margin-bottom: 56px;
+  }
+  @media (min-width: 900px) {
+    .section-head { grid-template-columns: 1fr 340px; align-items: end; gap: 56px; }
+  }
+  .section-title {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(36px, 5vw, 64px); line-height: 1.0;
+    letter-spacing: -0.022em; margin: 18px 0 0; text-wrap: balance;
+  }
+  .section-title em { font-style: italic; color: var(--orange); }
+  .section-lede { font-size: 15px; color: var(--mute); line-height: 1.6; }
+
+  .services-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+  @media (min-width: 720px) { .services-grid { grid-template-columns: 1fr 1fr; } }
+  @media (min-width: 1024px) { .services-grid { grid-template-columns: repeat(3, 1fr); gap: 0; } }
+
+  .service-card {
+    background: var(--paper); border: 1px solid var(--rule);
+    padding: 32px 28px 28px; display: flex; flex-direction: column;
+    min-height: 380px; position: relative;
+    transition: background .2s, border-color .2s;
+  }
+  @media (min-width: 1024px) {
+    .service-card { border-right: none; padding: 40px 32px 36px; }
+    .service-card:last-child { border-right: 1px solid var(--rule); }
+  }
+  .service-card:hover { background: var(--paper-warm); border-color: var(--ink); }
+  .service-card .n {
+    font-family: var(--mono); font-size: 11px; color: var(--gold); letter-spacing: 0.16em;
+  }
+  .service-card h3 {
+    font-family: var(--serif); font-weight: 400; font-size: 28px;
+    line-height: 1.1; letter-spacing: -0.012em; margin: 24px 0 14px; color: var(--ink);
+  }
+  .service-card .blurb { font-size: 14.5px; color: var(--mute); line-height: 1.55; margin: 0; }
+  .service-card ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 10px; }
+  .service-card li { display: flex; gap: 12px; font-size: 13.5px; color: var(--ink-soft); }
+  .service-card li::before { content: "—"; color: var(--orange); flex-shrink: 0; }
+  .service-card .pull {
+    margin-top: auto; padding-top: 24px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .service-card .pull .arrow {
+    font-family: var(--serif); font-style: italic; font-size: 16px; text-transform: none;
+  }
+
+  /* Statement strip */
+  .statement {
+    padding: 96px 0; background: var(--ink); color: var(--paper);
+    position: relative; overflow: hidden;
+  }
+  @media (min-width: 1024px) { .statement { padding: 128px 0; } }
+  .statement-grid { display: grid; grid-template-columns: 1fr; gap: 36px; align-items: center; }
+  @media (min-width: 900px) { .statement-grid { grid-template-columns: 1fr 320px; gap: 64px; } }
+  .statement p {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(28px, 3.8vw, 46px); line-height: 1.15;
+    letter-spacing: -0.015em; margin: 0; text-wrap: balance;
+  }
+  .statement p em { font-style: italic; color: var(--gold); }
+  .statement-meta {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: rgba(244,239,230,0.6);
+  }
+  .statement-rule { width: 56px; height: 1px; background: var(--gold); margin: 20px 0; }
+  .statement-sig {
+    font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--paper);
+  }
+  .statement-sig small {
+    display: block; font-style: normal; font-family: var(--mono);
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(244,239,230,0.5); margin-top: 6px;
+  }
+  .statement::before {
+    content: ""; position: absolute; top: -200px; right: -200px;
+    width: 480px; height: 480px; border: 1px solid rgba(201,161,74,0.35);
+    border-radius: 50%; pointer-events: none;
+  }
+  .statement::after {
+    content: ""; position: absolute; top: -120px; right: -120px;
+    width: 320px; height: 320px; border: 1px solid rgba(201,161,74,0.20);
+    border-radius: 50%; pointer-events: none;
+  }
+
+  /* Contact */
+  .contact { padding: 88px 0 96px; }
+  @media (min-width: 1024px) { .contact { padding: 128px 0 136px; } }
+
+  .contact-grid { display: grid; grid-template-columns: 1fr; gap: 48px; }
+  @media (min-width: 1024px) { .contact-grid { grid-template-columns: 1fr 1.05fr; gap: 80px; } }
+
+  .contact-info .lede {
+    font-size: 16px; color: var(--mute); line-height: 1.6;
+    max-width: 460px; margin: 24px 0 36px;
+  }
+
+  .contact-list { display: grid; gap: 28px; margin-top: 40px; }
+  .contact-row {
+    display: grid; grid-template-columns: 120px 1fr; gap: 16px;
+    align-items: start; padding-top: 18px; border-top: 1px solid var(--rule);
+  }
+  .contact-row .k {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--mute); padding-top: 4px;
+  }
+  .contact-row .v { font-family: var(--serif); font-size: 20px; color: var(--ink); line-height: 1.3; }
+  .contact-row .v small {
+    display: block; font-family: var(--sans); font-size: 13px;
+    color: var(--mute); margin-top: 4px;
+  }
+
+  /* form */
+  .form-card {
+    background: var(--paper-warm); border: 1px solid var(--rule);
+    padding: 36px 28px 32px;
+  }
+  @media (min-width: 720px) { .form-card { padding: 44px 40px 40px; } }
+  .form-card h3 {
+    font-family: var(--serif); font-weight: 400; font-size: 32px;
+    letter-spacing: -0.012em; line-height: 1.1; margin: 0 0 8px;
+  }
+  .form-card .form-sub { font-size: 14px; color: var(--mute); margin: 0 0 14px; }
+  .gift-tease {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201,161,74,0.14); border: 1px solid rgba(201,161,74,0.45);
+    color: var(--ink); padding: 8px 12px; font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    margin: 0 0 24px;
+  }
+  .gift-tease::before { content: "✦"; color: var(--gold); font-size: 14px; }
+  .form-row {
+    display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px;
+  }
+  @media (min-width: 720px) { .form-row.split { grid-template-columns: 1fr 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--mute);
+  }
+  .field input, .field select, .field textarea {
+    font: inherit; font-size: 15px; color: var(--ink);
+    background: var(--paper); border: 1px solid var(--rule);
+    padding: 14px 14px; border-radius: 0;
+    transition: border-color .15s, background .15s; width: 100%;
+  }
+  .field textarea { min-height: 110px; resize: vertical; font-family: var(--sans); }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--ink); background: #fff;
+  }
+  .form-error {
+    margin-top: 12px; padding: 12px 14px;
+    background: rgba(232,115,44,0.08); border: 1px solid rgba(232,115,44,0.45);
+    color: var(--ink); font-size: 13px;
+  }
+  .form-foot {
+    margin-top: 12px; display: flex; flex-wrap: wrap; gap: 18px;
+    align-items: center; justify-content: space-between;
+  }
+  .form-fineprint { font-size: 12px; color: var(--mute); max-width: 320px; line-height: 1.5; }
+  .form-submit { width: 100%; }
+  @media (min-width: 720px) { .form-submit { width: auto; } }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--rule); background: var(--paper-warm); padding: 56px 0 32px; }
+  .footer-grid { display: grid; grid-template-columns: 1fr; gap: 40px; }
+  @media (min-width: 720px) { .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; } }
+  @media (min-width: 1024px) { .footer-grid { grid-template-columns: 1.6fr 1fr 1fr 1.1fr; } }
+  .footer-col-head {
+    font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--mute); margin-bottom: 16px;
+  }
+  .footer-col ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .footer-col li { font-size: 14px; color: var(--ink-soft); }
+  .footer-col li:hover { color: var(--orange); }
+  .footer-blurb {
+    font-size: 14px; color: var(--mute); line-height: 1.6;
+    margin: 22px 0 0; max-width: 320px;
+  }
+  .office { font-size: 13px; line-height: 1.5; margin-bottom: 18px; }
+  .office .city { font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .office .addr { color: var(--mute); }
+  .footer-bottom {
+    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule);
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--mute);
+  }
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <a href="#top" class="logo" aria-label="AG FinTax — home">
+      <span class="logo-mark">ag</span>
+      <span class="logo-text">
+        <span class="logo-row">
+          <span class="logo-ag">AG</span><span class="logo-finTax">FinTax</span>
+        </span>
+        <span class="logo-tagline">Financial &amp; Tax Services</span>
+      </span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#insights">Insights</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a href="#contact" class="btn btn-primary">
+      Book free consultation
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="meta-label">Strategic tax planning · Est. 2008</span>
+      <h1 class="display">
+        Tax planning that <span class="accent">pays you back.</span>
+      </h1>
+      <p class="hero-sub">
+        AG FinTax helps high-net-worth families, founders, and growing businesses legally reduce their
+        tax burden — with year-round strategy, not last-minute filings.
+      </p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary btn-large">
+          Book a free consultation
+          <span class="arrow">→</span>
+        </a>
+        <a href="#services" class="btn btn-ghost">Explore our services</a>
+      </div>
+      <!-- TODO(stats): confirm real numbers before launch -->
+      <div class="hero-trust">
+        <div class="trust-stat">
+          <div class="n">$240M+</div>
+          <div class="l">Saved for clients</div>
+        </div>
+        <div class="trust-stat">
+          <div class="n">50</div>
+          <div class="l">U.S. states served</div>
+        </div>
+        <div class="trust-stat">
+          <div class="n">20+ yrs</div>
+          <div class="l">Strategic experience</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img class="hero-img" src="/assets/hero.jpg" alt="AG FinTax" />
+      <div class="hero-serial">AGFT · TX · NJ · WA</div>
+      <div class="hero-tag">
+        <div class="hero-tag-label">Founded &amp; led by</div>
+        <div class="hero-tag-name">Anil Grandhi, <em>CPA</em></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Press strip -->
+<!-- TODO(press): confirm real press placements before launch -->
+<section class="press" aria-label="Featured in">
+  <div class="wrap press-inner">
+    <div class="press-label">As featured in</div>
+    <div class="press-items">
+      <div class="press-name">Forbes</div>
+      <div class="press-name">Inc.</div>
+      <div class="press-name">Accounting Today</div>
+      <div class="press-name">U.S. News</div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="meta-label">(01) — Our services</span>
+        <h2 class="section-title">
+          Three planning practices, <em>one trusted firm.</em>
+        </h2>
+      </div>
+      <p class="section-lede">
+        We focus our practice where strategic planning makes the biggest difference: high-income
+        households, growing businesses, and the long arc of family wealth.
+      </p>
+    </div>
+
+    <div class="services-grid">
+      <article class="service-card">
+        <div class="n">01 / Individuals</div>
+        <h3>Individual tax planning</h3>
+        <p class="blurb">
+          Personalized strategies for high-earners, professionals, and high-net-worth families —
+          built to reduce liability and grow after-tax wealth.
+        </p>
+        <ul>
+          <li>Multi-year income smoothing</li>
+          <li>Deduction &amp; credit optimization</li>
+          <li>Retirement &amp; HSA strategy</li>
+          <li>Charitable &amp; gifting planning</li>
+        </ul>
+        <span class="pull">Learn more <span class="arrow">→</span></span>
+      </article>
+
+      <article class="service-card">
+        <div class="n">02 / Business</div>
+        <h3>Business &amp; corporate tax</h3>
+        <p class="blurb">
+          Year-round planning for founders, owners, and mid-market companies — entity structure,
+          deductions, and proactive tax positioning.
+        </p>
+        <ul>
+          <li>Entity selection &amp; structuring</li>
+          <li>QBI &amp; bonus depreciation strategy</li>
+          <li>Owner compensation modeling</li>
+          <li>R&amp;D and industry-specific credits</li>
+        </ul>
+        <span class="pull">Learn more <span class="arrow">→</span></span>
+      </article>
+
+      <article class="service-card">
+        <div class="n">03 / Estate</div>
+        <h3>Estate &amp; wealth planning</h3>
+        <p class="blurb">
+          Tax-efficient strategies to protect, grow, and transfer wealth across generations —
+          coordinated with your attorneys and advisors.
+        </p>
+        <ul>
+          <li>Estate &amp; gift tax strategy</li>
+          <li>Trust &amp; succession structuring</li>
+          <li>Wealth transfer modeling</li>
+          <li>Tax-efficient withdrawals</li>
+        </ul>
+        <span class="pull">Learn more <span class="arrow">→</span></span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Statement -->
+<section class="statement" aria-label="Promise">
+  <div class="wrap statement-grid">
+    <p>
+      Don't leave your taxes until the last minute. Careful, year-round planning is the difference
+      between an April scramble and a return that <em>quietly compounds</em> your wealth.
+    </p>
+    <div>
+      <div class="statement-meta">Our promise</div>
+      <div class="statement-rule"></div>
+      <div class="statement-sig">
+        Anil Grandhi
+        <small>Founder &amp; CPA · Forbes Finance Council</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-info">
+      <span class="meta-label">(02) — Book a call</span>
+      <h2 class="section-title">
+        Let's grab a <em>virtual coffee.</em>
+      </h2>
+      <p class="lede">
+        Tell us about your situation. We'll assess your options and show you, concretely, what a
+        year-round plan would save you in 2026. No cost, no commitment.
+      </p>
+
+      <div class="contact-list">
+        <div class="contact-row">
+          <div class="k">Sales</div>
+          <div class="v">(469) 942-9888 <small>Mon–Fri, 9–6 CT</small></div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Support</div>
+          <div class="v">(425) 395-4318 <small>Existing clients</small></div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Email</div>
+          <div class="v">Hello@agfintax.com</div>
+        </div>
+        <div class="contact-row">
+          <div class="k">Offices</div>
+          <div class="v" style="font-size:15px; line-height:1.55;">
+            <span style="font-family: var(--sans); font-size:13px; color: var(--ink-soft);">
+              Frisco, TX · Princeton, NJ · Bothell, WA
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="lead-form" class="form-card" novalidate>
+      <h3>Book your free consultation</h3>
+      <p class="form-sub">Takes a minute. We respond within one business day.</p>
+      <div class="gift-tease">A thank-you gift waits for you on our call</div>
+
+      <div class="form-row split">
+        <div class="field">
+          <label for="f-first">First name</label>
+          <input id="f-first" name="first_name" type="text" autocomplete="given-name" required />
+        </div>
+        <div class="field">
+          <label for="f-last">Last name</label>
+          <input id="f-last" name="last_name" type="text" autocomplete="family-name" required />
+        </div>
+      </div>
+      <div class="form-row split">
+        <div class="field">
+          <label for="f-email">Email</label>
+          <input id="f-email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div class="field">
+          <label for="f-phone">Phone</label>
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="f-interest">I'm interested in</label>
+          <select id="f-interest" name="interest">
+            <option>Individual tax planning</option>
+            <option>Business / corporate tax</option>
+            <option>Estate &amp; wealth planning</option>
+            <option>Not sure yet — let's talk</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="f-msg">Tell us about your situation (optional)</label>
+          <textarea id="f-msg" name="message" placeholder="Income mix, entities, what you'd like to improve…"></textarea>
+        </div>
+      </div>
+
+      <!-- Honeypot anti-spam field, hidden from real users -->
+      <div aria-hidden="true" style="position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;">
+        <label for="f-website">Website</label>
+        <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div id="form-error" class="form-error" style="display:none;"></div>
+
+      <div class="form-foot">
+        <p class="form-fineprint">
+          By submitting, you agree to be contacted by AG FinTax. We never share your details.
+        </p>
+        <button type="submit" class="btn btn-gold btn-large form-submit">
+          Book free consultation
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <a href="#top" class="logo">
+          <span class="logo-mark">ag</span>
+          <span class="logo-text">
+            <span class="logo-row">
+              <span class="logo-ag">AG</span><span class="logo-finTax">FinTax</span>
+            </span>
+            <span class="logo-tagline">Financial &amp; Tax Services</span>
+          </span>
+        </a>
+        <p class="footer-blurb">
+          Strategic tax planning, filing, and advisory for ambitious owners and high-net-worth
+          households across the United States.
+        </p>
+        <p class="footer-blurb" style="margin-top:14px;">
+          Hello@agfintax.com<br/>
+          Sales (469) 942-9888 · Support (425) 395-4318
+        </p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-head">Services</div>
+        <ul>
+          <li>Individual tax planning</li>
+          <li>Business &amp; corporate tax</li>
+          <li>Estate &amp; wealth planning</li>
+          <li>Tax filing &amp; compliance</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-head">Firm</div>
+        <ul>
+          <li>About</li>
+          <li>Insights</li>
+          <li>Press</li>
+          <li>Careers</li>
+          <li>Client portal</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-head">Offices</div>
+        <div class="office">
+          <div class="city">Frisco, TX</div>
+          <div class="addr">8195 S Custer Rd, Suite 200C, 75035</div>
+        </div>
+        <div class="office">
+          <div class="city">Princeton, NJ</div>
+          <div class="addr">5 Independence Way, Suite 300, 08540</div>
+        </div>
+        <div class="office">
+          <div class="city">Bothell, WA</div>
+          <div class="addr">22722 29th Dr SE, Suite 100, 98021</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 AG FinTax · All rights reserved</span>
+      <span>Privacy · Terms · Disclosures</span>
+    </div>
+  </div>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

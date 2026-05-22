@@ -1,0 +1,55 @@
+# Render Blueprint for AG FinTax landing page.
+# Two services: static site for the landing page, and a small Node API for
+# lead + pageview ingestion. The static site rewrites /api/* to the API
+# service so the browser sees a single origin (no CORS, real IPs preserved
+# via X-Forwarded-For on Render's edge).
+
+services:
+  # ─── Static landing page ─────────────────────────────────────────────
+  - type: web
+    runtime: static
+    name: agfintax-site
+    rootDir: site
+    buildCommand: ""        # nothing to build — plain HTML/CSS/JS
+    staticPublishPath: .
+    pullRequestPreviewsEnabled: false
+    routes:
+      # Route API calls to the API service so the browser sees same-origin
+      - type: rewrite
+        source: /api/*
+        # IMPORTANT: replace with the actual public URL Render assigns the
+        # agfintax-api web service after the first deploy (or its custom domain).
+        destination: https://agfintax-api.onrender.com/api/:splat
+      # SPA-style fallback isn't needed (single page), but keep root explicit
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+
+  # ─── Lead + pageview ingestion API ───────────────────────────────────
+  - type: web
+    runtime: node
+    name: agfintax-api
+    rootDir: server
+    plan: starter
+    region: oregon
+    buildCommand: npm install
+    startCommand: node index.js
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false           # set in Render dashboard
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false           # set in Render dashboard
+      - key: ALLOWED_ORIGIN
+        sync: false           # e.g. https://agfintax.com,https://www.agfintax.com
