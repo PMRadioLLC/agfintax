@@ -117,8 +117,8 @@
         sa_click_id:  attribution.sa_click_id || attribution.stackadapt_click_id || attribution.sa_cid || null
       };
 
-      if (!data.first_name || !data.last_name || !data.email) {
-        showError(form, "Please fill in your name and email.");
+      if (!data.first_name || !data.last_name || !data.email || !data.phone || !data.interest || !data.message) {
+        showError(form, "Please fill in all fields.");
         return;
       }
 

@@ -178,8 +178,11 @@ app.post("/api/lead", async (req, res) => {
   const first_name = pickString(b.first_name, 100);
   const last_name  = pickString(b.last_name, 100);
   const email      = pickString(b.email, 200);
-  if (!first_name || !last_name || !email || !isEmail(email)) {
-    return res.status(400).json({ ok: false, error: "Missing or invalid name/email." });
+  const phone      = pickString(b.phone, 50);
+  const interest   = pickString(b.interest, 100);
+  const message    = pickString(b.message, 4000);
+  if (!first_name || !last_name || !email || !phone || !interest || !message || !isEmail(email)) {
+    return res.status(400).json({ ok: false, error: "All fields are required, and the email must be valid." });
   }
 
   const doc = {
@@ -188,9 +191,9 @@ app.post("/api/lead", async (req, res) => {
     first_name,
     last_name,
     email:        email.toLowerCase(),
-    phone:        pickString(b.phone, 50),
-    interest:     pickString(b.interest, 100),
-    message:      pickString(b.message, 4000),
+    phone,
+    interest,
+    message,
     ip_address:   clientIp(req),
     user_agent:   pickString(b.user_agent, 500) || req.get("user-agent") || null,
     referrer:     pickString(b.referrer, 1000),

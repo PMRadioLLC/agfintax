@@ -634,13 +634,14 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
         </div>
         <div class="field">
           <label for="f-phone">Phone</label>
-          <input id="f-phone" name="phone" type="tel" autocomplete="tel" />
+          <input id="f-phone" name="phone" type="tel" autocomplete="tel" required />
         </div>
       </div>
       <div class="form-row">
         <div class="field">
           <label for="f-interest">I'm interested in</label>
-          <select id="f-interest" name="interest">
+          <select id="f-interest" name="interest" required>
+            <option value="" disabled selected>Please select…</option>
             <option>Individual tax planning</option>
             <option>Business / corporate tax</option>
             <option>Estate &amp; wealth planning</option>
@@ -650,8 +651,8 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
       </div>
       <div class="form-row">
         <div class="field">
-          <label for="f-msg">Tell us about your situation (optional)</label>
-          <textarea id="f-msg" name="message" placeholder="Income mix, entities, what you'd like to improve…"></textarea>
+          <label for="f-msg">Tell us about your situation</label>
+          <textarea id="f-msg" name="message" placeholder="Income mix, entities, what you'd like to improve…" required></textarea>
         </div>
       </div>
 
