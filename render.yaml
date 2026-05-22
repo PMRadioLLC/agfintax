@@ -53,3 +53,11 @@ services:
         sync: false           # set in Render dashboard (paste with literal \n)
       - key: ALLOWED_ORIGIN
         sync: false           # e.g. https://agfintax.com,https://www.agfintax.com
+      - key: MAILGUN_API_KEY
+        sync: false           # Mailgun → Send → API keys → Private API key
+      - key: MAILGUN_DOMAIN
+        sync: false           # the verified sending domain, e.g. mg.funasia.net
+      # Optional, leave unset to use defaults:
+      # - key: MAILGUN_API_BASE   # default https://api.mailgun.net/v3 (US)
+      # - key: LEAD_FROM          # default 'AG FinTax Leads <leads-agfintax@funasia.net>'
+      # - key: LEAD_TO            # default agfintax@funasia.net

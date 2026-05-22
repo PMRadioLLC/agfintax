@@ -8,6 +8,13 @@ const FIREBASE_CLIENT_EMAIL  = process.env.FIREBASE_CLIENT_EMAIL;
 const FIREBASE_PRIVATE_KEY   = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
 const ALLOWED_ORIGIN = (process.env.ALLOWED_ORIGIN || "").split(",").map(s => s.trim()).filter(Boolean);
 
+// Mailgun (optional — if unconfigured, server runs but no notifications fire)
+const MAILGUN_API_KEY  = process.env.MAILGUN_API_KEY  || "";
+const MAILGUN_DOMAIN   = process.env.MAILGUN_DOMAIN   || "";
+const MAILGUN_API_BASE = process.env.MAILGUN_API_BASE || "https://api.mailgun.net/v3";
+const LEAD_FROM        = process.env.LEAD_FROM        || "AG FinTax Leads <leads-agfintax@funasia.net>";
+const LEAD_TO          = process.env.LEAD_TO          || "agfintax@funasia.net";
+
 if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
   console.error("Missing FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, or FIREBASE_PRIVATE_KEY in env.");
   process.exit(1);
@@ -52,6 +59,83 @@ function pickString(v, max = 2000) {
 
 function isEmail(v) {
   return typeof v === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+// Send a lead notification via Mailgun. Fire-and-forget — never throws.
+// If MAILGUN_API_KEY or MAILGUN_DOMAIN is unset, this is a no-op.
+async function notifyLead(lead) {
+  if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN) {
+    console.warn("[lead] mailgun not configured (MAILGUN_API_KEY / MAILGUN_DOMAIN missing); skipping notification");
+    return;
+  }
+
+  const subject = `New lead: ${lead.first_name} ${lead.last_name} (${lead.interest || "general"})`;
+
+  const rows = [
+    ["Name",                 `${lead.first_name} ${lead.last_name}`],
+    ["Email",                lead.email],
+    ["Phone",                lead.phone || "—"],
+    ["Interest",             lead.interest || "—"],
+    ["Message",              lead.message || "—"],
+    ["IP address",           lead.ip_address || "—"],
+    ["Referrer",             lead.referrer || "—"],
+    ["Landing page",         lead.landing_page || "—"],
+    ["UTM source",           lead.utm_source || "—"],
+    ["UTM medium",           lead.utm_medium || "—"],
+    ["UTM campaign",         lead.utm_campaign || "—"],
+    ["UTM content",          lead.utm_content || "—"],
+    ["UTM term",             lead.utm_term || "—"],
+    ["StackAdapt click ID",  lead.sa_click_id || "—"],
+    ["User agent",           lead.user_agent || "—"]
+  ];
+
+  const text = rows.map(function (r) { return r[0] + ": " + r[1]; }).join("\n");
+  const html =
+    '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:640px;">' +
+    '<h2 style="font-family:Georgia,serif;font-weight:400;color:#0A1F44;margin:0 0 8px;">New lead on agfintax.com</h2>' +
+    '<p style="color:#666;margin:0 0 24px;font-size:14px;">A visitor submitted the contact form. Details below.</p>' +
+    '<table style="border-collapse:collapse;width:100%;font-size:14px;">' +
+    rows.map(function (r) {
+      return '<tr>' +
+        '<td style="padding:6px 14px 6px 0;color:#888;vertical-align:top;width:160px;white-space:nowrap;">' + escapeHtml(r[0]) + '</td>' +
+        '<td style="padding:6px 0;color:#111;word-break:break-word;">' + escapeHtml(r[1]) + '</td>' +
+      '</tr>';
+    }).join("") +
+    '</table>' +
+    '<p style="margin-top:28px;font-size:12px;color:#999;">Reply directly to this email to respond to the lead — the Reply-To header is set to their address.</p>' +
+    '</div>';
+
+  const form = new URLSearchParams();
+  form.set("from", LEAD_FROM);
+  form.set("to", LEAD_TO);
+  form.set("subject", subject);
+  form.set("text", text);
+  form.set("html", html);
+  if (lead.email) form.set("h:Reply-To", lead.email);
+
+  try {
+    const res = await fetch(`${MAILGUN_API_BASE}/${encodeURIComponent(MAILGUN_DOMAIN)}/messages`, {
+      method: "POST",
+      headers: {
+        "Authorization": "Basic " + Buffer.from(`api:${MAILGUN_API_KEY}`).toString("base64")
+      },
+      body: form
+    });
+    if (!res.ok) {
+      const t = await res.text();
+      console.error("[lead] mailgun returned non-2xx:", res.status, t);
+      return;
+    }
+    console.log("[lead] mailgun notification sent for", lead.email);
+  } catch (err) {
+    console.error("[lead] mailgun threw:", err);
+  }
 }
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
@@ -121,6 +205,8 @@ app.post("/api/lead", async (req, res) => {
 
   try {
     await db.collection("leads").add(doc);
+    // Fire-and-forget the email; don't block the form response if Mailgun is slow/down
+    notifyLead(doc).catch(function (err) { console.error("[lead] notifyLead unexpected throw:", err); });
     res.json({ ok: true });
   } catch (err) {
     console.error("[lead] firestore add error", err);
