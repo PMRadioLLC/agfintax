@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Block the Render preview URL from being indexed — we only want
+# agfintax.funasia.net to rank in Google, not the .onrender.com mirror.
+# Sitemap URL must be absolute.
+Sitemap: https://agfintax.funasia.net/sitemap.xml

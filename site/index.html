@@ -3,18 +3,118 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>AG FinTax — Strategic tax planning for ambitious owners and families</title>
-<meta name="description" content="AG FinTax helps high-net-worth families, founders, and growing businesses legally reduce their tax burden with year-round strategy." />
+
+<!-- ─── Core SEO ─────────────────────────────────────────────────────────── -->
+<title>Tax Planning for High-Income Earners | AG FinTax — Free Review, CPA-Led</title>
+<meta name="description" content="Free tax planning review for $250K+ income earners. CPA-led, year-round strategy to legally reduce your tax burden. Offices in Frisco TX, Princeton NJ, Bothell WA. Book your free consultation." />
+<meta name="keywords" content="tax planning, tax planning for high income earners, CPA tax planning, high net worth tax planning, business tax planning, estate tax planning, tax planning Dallas, tax planning Frisco, tax planning Princeton, tax planning Bothell, free tax review" />
+<meta name="author" content="AG FinTax" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+<link rel="canonical" href="https://agfintax.funasia.net/" />
+
+<!-- ─── Open Graph (Facebook, LinkedIn, iMessage link previews) ──────────── -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="AG FinTax" />
+<meta property="og:title" content="Tax Planning for High-Income Earners — Free Review | AG FinTax" />
+<meta property="og:description" content="Free tax planning review for $250K+ income earners. CPA-led, year-round strategy to legally reduce your tax burden." />
+<meta property="og:url" content="https://agfintax.funasia.net/" />
+<meta property="og:image" content="https://agfintax.funasia.net/assets/hero.png" />
+<meta property="og:image:width" content="928" />
+<meta property="og:image:height" content="1152" />
+<meta property="og:locale" content="en_US" />
+
+<!-- ─── Twitter Card ─────────────────────────────────────────────────────── -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tax Planning for High-Income Earners — Free Review | AG FinTax" />
+<meta name="twitter:description" content="Free tax planning review for $250K+ income earners. CPA-led, year-round strategy." />
+<meta name="twitter:image" content="https://agfintax.funasia.net/assets/hero.png" />
+
+<!-- ─── JSON-LD structured data — AccountingService for local SEO ───────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AccountingService",
+  "name": "AG FinTax",
+  "alternateName": "AG FinTax Financial & Tax Services",
+  "description": "Strategic, year-round tax planning, filing, and advisory for high-income earners, business owners, and high-net-worth families across the United States.",
+  "url": "https://agfintax.funasia.net/",
+  "image": "https://agfintax.funasia.net/assets/hero.png",
+  "telephone": "+1-469-942-9888",
+  "email": "agfintax@funasia.net",
+  "priceRange": "$$$",
+  "areaServed": {
+    "@type": "Country",
+    "name": "United States"
+  },
+  "serviceType": [
+    "Individual tax planning",
+    "Business and corporate tax",
+    "Estate and wealth planning",
+    "Tax filing and compliance"
+  ],
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "09:00",
+    "closes": "18:00"
+  },
+  "address": [
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "8195 S Custer Rd, Suite 200C",
+      "addressLocality": "Frisco",
+      "addressRegion": "TX",
+      "postalCode": "75035",
+      "addressCountry": "US"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "5 Independence Way, Suite 300",
+      "addressLocality": "Princeton",
+      "addressRegion": "NJ",
+      "postalCode": "08540",
+      "addressCountry": "US"
+    },
+    {
+      "@type": "PostalAddress",
+      "streetAddress": "22722 29th Dr SE, Suite 100",
+      "addressLocality": "Bothell",
+      "addressRegion": "WA",
+      "postalCode": "98021",
+      "addressCountry": "US"
+    }
+  ]
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
 
-<!-- Runtime config: where the lead/tracking API lives. -->
+<!-- Runtime config: API base + optional Google Analytics 4 Measurement ID. -->
 <script>
   window.AGFT_CONFIG = {
-    apiBase: "https://agfintax-api.onrender.com"
+    apiBase: "https://agfintax-api.onrender.com",
+    // Paste your GA4 Measurement ID here (looks like 'G-XXXXXXXXXX') to enable
+    // Google Analytics. Leave as "" to disable GA entirely — no script loaded.
+    gaMeasurementId: ""
   };
+</script>
+
+<!-- ─── Google Analytics 4 — loads only if gaMeasurementId is set ────────── -->
+<script>
+  (function () {
+    var id = (window.AGFT_CONFIG || {}).gaMeasurementId;
+    if (!id) return;
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://www.googletagmanager.com/gtag/js?id=" + id;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", id, { send_page_view: true });
+  })();
 </script>
 
 <!-- StackAdapt universal pixel (site-wide). Fires on every pageview.

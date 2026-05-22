@@ -128,6 +128,18 @@
         .then(function () {
           setSubmitted(form);
           try { window.saConversion(); } catch (e) { console.warn("[agft] saConversion threw", e); }
+          // Fire GA4 conversion event (no-op if GA isn't configured).
+          try {
+            if (typeof window.gtag === "function") {
+              window.gtag("event", "generate_lead", {
+                value: 0,
+                currency: "USD",
+                lead_interest: data.interest || "unknown",
+                utm_source: data.utm_source || null,
+                utm_campaign: data.utm_campaign || null
+              });
+            }
+          } catch (e) { console.warn("[agft] gtag generate_lead threw", e); }
         })
         .catch(function (err) {
           console.error("[agft] lead submit failed", err);
