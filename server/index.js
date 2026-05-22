@@ -6,7 +6,18 @@ const PORT = process.env.PORT || 8080;
 const FIREBASE_PROJECT_ID    = process.env.FIREBASE_PROJECT_ID;
 const FIREBASE_CLIENT_EMAIL  = process.env.FIREBASE_CLIENT_EMAIL;
 const FIREBASE_PRIVATE_KEY   = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
-const ALLOWED_ORIGIN = (process.env.ALLOWED_ORIGIN || "").split(",").map(s => s.trim()).filter(Boolean);
+// Always-allowed origins for the AG FinTax landing page. Hardcoded so a missing
+// or misconfigured env var can't lock the site out. Env-var ALLOWED_ORIGIN is
+// merged in as an extension if you want to add more domains without a deploy.
+const BUILTIN_ORIGINS = [
+  "https://agfintax-site.onrender.com",
+  "https://agfintax.funasia.net",
+  "https://www.agfintax.funasia.net"
+];
+const ALLOWED_ORIGIN = Array.from(new Set([
+  ...BUILTIN_ORIGINS,
+  ...(process.env.ALLOWED_ORIGIN || "").split(",").map(s => s.trim()).filter(Boolean)
+]));
 
 // Mailgun (optional — if unconfigured, server runs but no notifications fire)
 const MAILGUN_API_KEY  = process.env.MAILGUN_API_KEY  || "";
@@ -39,20 +50,16 @@ app.use(cors({
   origin: function (origin, cb) {
     // No origin header → same-origin request, curl, or server-to-server. Allow.
     if (!origin) return cb(null, true);
-    // No allowed list configured → permissive (logged at boot below).
-    if (ALLOWED_ORIGIN.length === 0) return cb(null, true);
-    // Exact match against the configured allow-list.
+    // Exact match against the union of built-in + env-var origins.
     if (ALLOWED_ORIGIN.includes(origin)) return cb(null, true);
-    // Reject WITHOUT throwing — throwing makes Express return 500 on the
-    // preflight, which masks the real cause. Returning false makes the
-    // middleware send a clean rejection that the browser surfaces as a CORS
-    // error, and we log the mismatch so it's debuggable from Render logs.
-    console.warn("[cors] rejecting origin:", origin, "— configured ALLOWED_ORIGIN:", ALLOWED_ORIGIN);
+    // Clean rejection (no throw, so no 500). Logged so the mismatch is visible
+    // in Render logs and we can add the domain to BUILTIN_ORIGINS or env var.
+    console.warn("[cors] rejecting origin:", origin, "— allowed:", ALLOWED_ORIGIN);
     return cb(null, false);
   }
 }));
 
-console.log("[boot] ALLOWED_ORIGIN =", ALLOWED_ORIGIN.length ? ALLOWED_ORIGIN : "(empty — permissive mode)");
+console.log("[boot] CORS allow-list =", ALLOWED_ORIGIN);
 
 function clientIp(req) {
   const ip = req.ip || req.connection?.remoteAddress || null;
