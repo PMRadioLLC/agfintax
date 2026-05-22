@@ -64,14 +64,12 @@
   }
 
   // Fires the StackAdapt conversion event after a successful form submit.
-  // The universal pixel (saq) is loaded in index.html; this just records the
-  // conversion against a specific Conversion Pixel ID created in the
-  // StackAdapt dashboard. Replace the placeholder ID below with the real one.
-  var STACKADAPT_CONVERSION_ID = "REPLACE_WITH_CONVERSION_PIXEL_ID"; // TODO(stackadapt)
+  // The universal pixel (saq) is loaded in index.html; this records the
+  // conversion against the configured pixel ID.
+  var STACKADAPT_CONVERSION_ID = "Y1kc0SZIajJ0e7K0jtwhpw";
   window.saConversion = function () {
-    if (typeof window.saq !== "function") return;
-    if (STACKADAPT_CONVERSION_ID === "REPLACE_WITH_CONVERSION_PIXEL_ID") {
-      console.warn("[agft] StackAdapt conversion pixel ID not set; skipping.");
+    if (typeof window.saq !== "function") {
+      console.warn("[agft] StackAdapt saq not loaded; conversion not fired.");
       return;
     }
     window.saq("conv", STACKADAPT_CONVERSION_ID);
