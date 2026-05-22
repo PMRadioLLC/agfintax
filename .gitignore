@@ -6,3 +6,11 @@ node_modules/
 design/
 .vscode/
 .idea/
+
+# Video files — keep out of the repo; use external storage / StackAdapt directly.
+# These are marketing assets, not website assets, and they bloat git history fast.
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
