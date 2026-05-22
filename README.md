@@ -1,10 +1,10 @@
 # AG FinTax — Landing Page
 
-Static landing page (`/site`) + tiny Node API (`/server`) that captures form leads and pageviews to Supabase. Designed for StackAdapt-driven paid traffic with full attribution + real client IPs.
+Static landing page (`/site`) + tiny Node API (`/server`) that captures form leads and pageviews to **Firebase Firestore**. Designed for StackAdapt-driven paid traffic with full attribution + real client IPs.
 
 ## What's tracked
 
-Every visit and every form submission is written to Supabase with:
+Every visit and every form submission is written to Firestore with:
 
 - **Real client IP** (captured server-side from `X-Forwarded-For` so it can't be spoofed by the browser)
 - **User agent + referrer**
@@ -15,62 +15,88 @@ Every visit and every form submission is written to Supabase with:
 ## Project layout
 
 ```
-/site/              static landing page (deployed as Render Static Site)
-  index.html        the page
-  app.js            UTM capture, form submit, pageview ping
-  assets/hero.jpg   hero image
-/server/            Node/Express API (deployed as Render Web Service)
-  index.js          POST /api/lead + POST /api/track + GET /health
+/site/                  static landing page (deployed as Render Static Site)
+  index.html            the page
+  app.js                UTM capture, form submit, pageview ping
+  assets/hero.jpg       hero image
+/server/                Node/Express API (deployed as Render Web Service)
+  index.js              POST /api/lead + POST /api/track + GET /health
   package.json
   .env.example
-/supabase/
-  schema.sql        run this once in the Supabase SQL editor
-/render.yaml        Render Blueprint (creates both services)
+/firestore/
+  collections.md        documents the shape of leads + pageviews
+/render.yaml            Render Blueprint (creates both services)
 ```
 
 ## Setup — step by step
 
-### 1. Create the Supabase project
+### 1. Create the Firebase project
 
-1. Go to https://supabase.com → **New project**. Pick a region close to your users (US-East is fine).
-2. Once created, open **SQL Editor** → **New query** → paste the contents of [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
-3. Open **Project Settings → API** and copy two values:
-   - **Project URL** (e.g. `https://abcdxyz.supabase.co`) → `SUPABASE_URL`
-   - **`service_role` secret** (under "Project API keys") → `SUPABASE_SERVICE_ROLE_KEY`
-   - ⚠️ The `service_role` key bypasses Row Level Security. Keep it server-side only. **Never** put it in `site/` or commit it.
+1. Go to https://console.firebase.google.com → **Add project** → name it `agfintax` (or whatever). Skip Google Analytics if it asks — you don't need it for this.
+2. After the project is created, in the left sidebar open **Build → Firestore Database** → **Create database**:
+   - **Mode:** start in **production mode** (we'll lock it down further in step 4)
+   - **Location:** pick the region closest to your users. `nam5 (us-central)` is a good default for US-targeted StackAdapt traffic.
+3. The collections (`leads`, `pageviews`) don't need to be created manually — Firestore auto-creates them on the first write. See [`firestore/collections.md`](firestore/collections.md) for the document shape.
 
-### 2. Deploy to Render
+### 2. Generate a service account key
 
-1. Push this repo to GitHub.
+The API writes to Firestore using the Firebase **Admin SDK**, which needs a service account.
+
+1. Firebase Console → ⚙ icon (top left) → **Project settings**
+2. Tab → **Service accounts**
+3. Make sure **Node.js** is selected
+4. Click **Generate new private key** → a JSON file downloads. **Keep this file safe** — it's the equivalent of a master password to your Firestore data.
+5. Open the JSON. You need three values from it for the API env vars:
+   - `project_id` → `FIREBASE_PROJECT_ID`
+   - `client_email` → `FIREBASE_CLIENT_EMAIL`
+   - `private_key` → `FIREBASE_PRIVATE_KEY` (long multi-line string starting with `-----BEGIN PRIVATE KEY-----`)
+
+### 3. Deploy to Render
+
+1. Push this repo to GitHub (already done at https://github.com/sankalp047/agfintax).
 2. On https://render.com → **New +** → **Blueprint** → connect your repo. Render reads `render.yaml` and creates two services:
    - `agfintax-site` — static landing page
    - `agfintax-api` — Node API
-3. On `agfintax-api`, open **Environment** and set:
-   - `SUPABASE_URL` — from step 1
-   - `SUPABASE_SERVICE_ROLE_KEY` — from step 1
+3. On `agfintax-api`, open **Environment** → **Add Environment Variable** for each of:
+   - `FIREBASE_PROJECT_ID` — the `project_id` value
+   - `FIREBASE_CLIENT_EMAIL` — the `client_email` value
+   - `FIREBASE_PRIVATE_KEY` — the `private_key` value, **pasted exactly as it appears in the JSON** (with literal `\n` sequences inside the string). The server replaces `\n` with newlines at startup.
    - `ALLOWED_ORIGIN` — comma-separated list of every domain the site will be served from, e.g. `https://agfintax.com,https://www.agfintax.com,https://agfintax-site.onrender.com`
-4. Once the API service deploys, copy its public URL (e.g. `https://agfintax-api.onrender.com`). Open [`render.yaml`](render.yaml) and replace the `destination:` line under the `/api/*` rewrite with that URL. Commit + push — the static site redeploys and now proxies `/api/*` to the API.
+4. Save and let the service redeploy. Visit `https://agfintax-api.onrender.com/health` — it should return `{"ok":true}`.
+5. Copy the API service's public URL. Open [`render.yaml`](render.yaml) and replace the `destination:` line under the `/api/*` rewrite with that URL. Commit + push — the static site redeploys and now proxies `/api/*` to the API.
 
-### 3. Add the custom domain
+### 4. Lock down Firestore rules
+
+The API uses the Admin SDK (bypasses rules entirely), so we can — and should — block all browser access.
+
+1. Firebase Console → **Firestore Database** → **Rules** tab
+2. Replace whatever's there with:
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /{document=**} {
+         allow read, write: if false;
+       }
+     }
+   }
+   ```
+3. **Publish.**
+
+This means even if someone guesses your collection names, they can't read your leads. Only your API can.
+
+### 5. Add the custom domain
 
 1. On Render, open `agfintax-site` → **Settings → Custom Domains** → add your domain (e.g. `agfintax.com` and `www.agfintax.com`).
 2. Follow Render's instructions to add the CNAME/ANAME records at your DNS provider.
-3. Once the domain is verified, add it to `ALLOWED_ORIGIN` on the API service if it wasn't already there.
+3. Once verified, add the domain to `ALLOWED_ORIGIN` on the API service if it wasn't already there.
 
-### 4. Wire the StackAdapt conversion pixel
+### 6. Wire the StackAdapt conversion pixel
 
-There are two places to paste StackAdapt code:
+Two places:
 
-- **Base site-wide pixel** — paste the snippet StackAdapt gives you in [`site/index.html`](site/index.html), where you'll find:
-  ```html
-  <!-- TODO(stackadapt): paste base pixel snippet here -->
-  ```
-- **Conversion event** — paste the conversion snippet inside `window.saConversion` in [`site/app.js`](site/app.js). It fires automatically after a successful form submit:
-  ```js
-  window.saConversion = function () {
-    // TODO(stackadapt): fire conversion event here.
-  };
-  ```
+- **Base site-wide pixel** — already installed in [`site/index.html`](site/index.html) (`saq('ts', 'Y1kc0SZIajJ0e7K0jtwhpw')`).
+- **Conversion event** — open [`site/app.js`](site/app.js), find `STACKADAPT_CONVERSION_ID`, replace `REPLACE_WITH_CONVERSION_PIXEL_ID` with your conversion pixel ID from the StackAdapt dashboard (**Tracking → Conversions**). Fires automatically on successful form submit.
 
 When you send StackAdapt traffic to the site, append UTM params and/or a click-ID param to the destination URL, e.g.:
 
@@ -78,23 +104,21 @@ When you send StackAdapt traffic to the site, append UTM params and/or a click-I
 https://agfintax.com/?utm_source=stackadapt&utm_medium=display&utm_campaign=q2-2026&sa_click_id={click_id_macro}
 ```
 
-`app.js` reads these on landing, persists them in `sessionStorage`, and attaches them to both the pageview ping and the lead row.
-
-### 5. (Optional) Confirm trust signals before launch
+### 7. Confirm trust signals before launch
 
 Two blocks in `site/index.html` are marked `TODO`:
 
 - `TODO(stats)` — the `$240M+ saved / 50 states / 20+ yrs` numbers in the hero
 - `TODO(press)` — the `Forbes / Inc. / Accounting Today / U.S. News` press strip
 
-Replace these with real, defensible numbers and outlets before driving paid traffic. Don't ship fake trust signals.
+Replace these with real, defensible numbers and outlets before driving paid traffic.
 
 ## Local development
 
 ```bash
 # Terminal 1 — API
 cd server
-cp .env.example .env   # fill in SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+cp .env.example .env   # fill in the three FIREBASE_* values
 npm install
 npm run dev            # listens on :8080
 
@@ -107,43 +131,48 @@ python3 -m http.server 5173
 # "http://localhost:8080" so fetches reach your API.
 ```
 
-## What lives where in Supabase
+## Viewing leads + pageviews
 
-- **`leads`** — one row per form submission. Includes name, email, phone, interest, optional message, IP, user agent, full attribution.
-- **`pageviews`** — one row per landing page visit. Includes IP, user agent, referrer, UTM, click ID, path.
+### Option A — Firebase Console (easiest)
 
-Both tables have RLS enabled with **no public policies** — only the service-role key (used by the API) can read or write. If you want to view leads in Supabase Studio, log in with a user who has the appropriate role, or query via the SQL editor.
+1. Firebase Console → **Firestore Database** → **Data** tab
+2. Click into `leads` or `pageviews`
+3. Use the **filter** controls at the top to narrow by field (e.g. `utm_source == stackadapt`)
+4. Click any document to see all fields
 
-## Useful queries
+### Option B — Programmatic queries
 
-```sql
--- Leads from StackAdapt, newest first
-select created_at, first_name, last_name, email, phone, interest,
-       utm_campaign, utm_content, sa_click_id, ip_address
-from leads
-where utm_source = 'stackadapt'
-order by created_at desc;
+If you want code-driven dashboards or exports, query Firestore from a Node script using the Admin SDK. Examples:
 
--- Unique visitors per day from StackAdapt
-select date_trunc('day', created_at) as day,
-       count(distinct ip_address) as unique_ips,
-       count(*) as pageviews
-from pageviews
-where utm_source = 'stackadapt'
-group by 1
-order by 1 desc;
+```js
+const admin = require("firebase-admin");
+admin.initializeApp({ credential: admin.credential.cert(require("./service-account.json")) });
+const db = admin.firestore();
 
--- Conversion rate by campaign
-with v as (
-  select utm_campaign, count(distinct ip_address) as visitors
-  from pageviews where utm_source = 'stackadapt' group by 1
-),
-l as (
-  select utm_campaign, count(*) as leads
-  from leads where utm_source = 'stackadapt' group by 1
-)
-select v.utm_campaign, v.visitors, coalesce(l.leads, 0) as leads,
-       round(100.0 * coalesce(l.leads, 0) / nullif(v.visitors, 0), 2) as cvr_pct
-from v left join l using (utm_campaign)
-order by visitors desc;
+// All StackAdapt leads, newest first, last 30 days
+const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+const snap = await db.collection("leads")
+  .where("utm_source", "==", "stackadapt")
+  .where("created_at", ">=", since)
+  .orderBy("created_at", "desc")
+  .get();
+snap.forEach(d => console.log(d.id, d.data()));
+
+// Unique visitors today
+const today = new Date(); today.setHours(0,0,0,0);
+const pvs = await db.collection("pageviews")
+  .where("created_at", ">=", today)
+  .get();
+const ips = new Set();
+pvs.forEach(d => { const ip = d.data().ip_address; if (ip) ips.add(ip); });
+console.log("unique visitors today:", ips.size);
 ```
+
+The first time you run a query that combines `where` + `where` + `orderBy`, Firestore will throw an error containing a one-click link to create the required composite index. Click it, wait ~30 seconds, re-run.
+
+## What lives where in Firestore
+
+- **`leads`** — one document per form submission. Includes name, email, phone, interest, optional message, IP, user agent, full attribution.
+- **`pageviews`** — one document per landing page visit. Includes IP, user agent, referrer, UTM, click ID, path.
+
+Full schema: [`firestore/collections.md`](firestore/collections.md).

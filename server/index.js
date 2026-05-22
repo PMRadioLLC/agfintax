@@ -1,20 +1,28 @@
 const express = require("express");
 const cors = require("cors");
-const { createClient } = require("@supabase/supabase-js");
+const admin = require("firebase-admin");
 
 const PORT = process.env.PORT || 8080;
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const FIREBASE_PROJECT_ID    = process.env.FIREBASE_PROJECT_ID;
+const FIREBASE_CLIENT_EMAIL  = process.env.FIREBASE_CLIENT_EMAIL;
+const FIREBASE_PRIVATE_KEY   = (process.env.FIREBASE_PRIVATE_KEY || "").replace(/\\n/g, "\n");
 const ALLOWED_ORIGIN = (process.env.ALLOWED_ORIGIN || "").split(",").map(s => s.trim()).filter(Boolean);
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-  console.error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in env.");
+if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
+  console.error("Missing FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, or FIREBASE_PRIVATE_KEY in env.");
   process.exit(1);
 }
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
-  auth: { persistSession: false }
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId:   FIREBASE_PROJECT_ID,
+    clientEmail: FIREBASE_CLIENT_EMAIL,
+    privateKey:  FIREBASE_PRIVATE_KEY
+  })
 });
+
+const db = admin.firestore();
+const FieldValue = admin.firestore.FieldValue;
 
 const app = express();
 app.set("trust proxy", true); // Render sits behind a proxy; needed for real client IP
@@ -30,7 +38,6 @@ app.use(cors({
 }));
 
 function clientIp(req) {
-  // Express with trust proxy: req.ip honors X-Forwarded-For
   const ip = req.ip || req.connection?.remoteAddress || null;
   if (!ip) return null;
   return ip.replace(/^::ffff:/, "");
@@ -51,7 +58,8 @@ app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.post("/api/track", async (req, res) => {
   const b = req.body || {};
-  const row = {
+  const doc = {
+    created_at:   FieldValue.serverTimestamp(),
     ip_address:   clientIp(req),
     user_agent:   pickString(b.user_agent, 500) || req.get("user-agent") || null,
     referrer:     pickString(b.referrer, 1000),
@@ -65,12 +73,13 @@ app.post("/api/track", async (req, res) => {
     sa_click_id:  pickString(b.sa_click_id, 200)
   };
 
-  const { error } = await supabase.from("pageviews").insert(row);
-  if (error) {
-    console.error("[track] insert error", error);
-    return res.status(500).json({ ok: false });
+  try {
+    await db.collection("pageviews").add(doc);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("[track] firestore add error", err);
+    res.status(500).json({ ok: false });
   }
-  res.json({ ok: true });
 });
 
 app.post("/api/lead", async (req, res) => {
@@ -88,10 +97,12 @@ app.post("/api/lead", async (req, res) => {
     return res.status(400).json({ ok: false, error: "Missing or invalid name/email." });
   }
 
-  const row = {
+  const doc = {
+    created_at:   FieldValue.serverTimestamp(),
+    status:       "new",
     first_name,
     last_name,
-    email: email.toLowerCase(),
+    email:        email.toLowerCase(),
     phone:        pickString(b.phone, 50),
     interest:     pickString(b.interest, 100),
     message:      pickString(b.message, 4000),
@@ -107,14 +118,15 @@ app.post("/api/lead", async (req, res) => {
     sa_click_id:  pickString(b.sa_click_id, 200)
   };
 
-  const { error } = await supabase.from("leads").insert(row);
-  if (error) {
-    console.error("[lead] insert error", error);
-    return res.status(500).json({ ok: false, error: "Could not save lead." });
+  try {
+    await db.collection("leads").add(doc);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error("[lead] firestore add error", err);
+    res.status(500).json({ ok: false, error: "Could not save lead." });
   }
-  res.json({ ok: true });
 });
 
 app.listen(PORT, () => {
-  console.log(`agfintax-api listening on :${PORT}`);
+  console.log(`agfintax-api (firestore) listening on :${PORT}`);
 });

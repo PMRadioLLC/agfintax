@@ -1,8 +1,8 @@
 # Render Blueprint for AG FinTax landing page.
 # Two services: static site for the landing page, and a small Node API for
-# lead + pageview ingestion. The static site rewrites /api/* to the API
-# service so the browser sees a single origin (no CORS, real IPs preserved
-# via X-Forwarded-For on Render's edge).
+# lead + pageview ingestion (Firestore-backed). The static site rewrites
+# /api/* to the API service so the browser sees a single origin (no CORS,
+# real IPs preserved via X-Forwarded-For on Render's edge).
 
 services:
   # ─── Static landing page ─────────────────────────────────────────────
@@ -20,7 +20,6 @@ services:
         # IMPORTANT: replace with the actual public URL Render assigns the
         # agfintax-api web service after the first deploy (or its custom domain).
         destination: https://agfintax-api.onrender.com/api/:splat
-      # SPA-style fallback isn't needed (single page), but keep root explicit
       - type: rewrite
         source: /*
         destination: /index.html
@@ -35,7 +34,7 @@ services:
         name: Cache-Control
         value: public, max-age=31536000, immutable
 
-  # ─── Lead + pageview ingestion API ───────────────────────────────────
+  # ─── Lead + pageview ingestion API (Firestore) ───────────────────────
   - type: web
     runtime: node
     name: agfintax-api
@@ -47,9 +46,11 @@ services:
     healthCheckPath: /health
     autoDeploy: true
     envVars:
-      - key: SUPABASE_URL
+      - key: FIREBASE_PROJECT_ID
         sync: false           # set in Render dashboard
-      - key: SUPABASE_SERVICE_ROLE_KEY
+      - key: FIREBASE_CLIENT_EMAIL
         sync: false           # set in Render dashboard
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false           # set in Render dashboard (paste with literal \n)
       - key: ALLOWED_ORIGIN
         sync: false           # e.g. https://agfintax.com,https://www.agfintax.com

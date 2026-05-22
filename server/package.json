@@ -2,7 +2,7 @@
   "name": "agfintax-api",
   "version": "1.0.0",
   "private": true,
-  "description": "Lead + pageview ingestion API for the AG FinTax landing page",
+  "description": "Lead + pageview ingestion API for the AG FinTax landing page (Firestore-backed)",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
@@ -13,8 +13,8 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
     "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "firebase-admin": "^12.3.0"
   }
 }
