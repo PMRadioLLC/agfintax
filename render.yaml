@@ -14,12 +14,11 @@ services:
     staticPublishPath: .
     pullRequestPreviewsEnabled: false
     routes:
-      # Route API calls to the API service so the browser sees same-origin
-      - type: rewrite
-        source: /api/*
-        # IMPORTANT: replace with the actual public URL Render assigns the
-        # agfintax-api web service after the first deploy (or its custom domain).
-        destination: https://agfintax-api.onrender.com/api/:splat
+      # SPA-style fallback so deep links return index.html.
+      # The browser calls the API directly using window.AGFT_CONFIG.apiBase
+      # (set in site/index.html) — Render static-site rewrites don't expand
+      # :splat to external URLs reliably, so we skip that approach. CORS on
+      # the API service permits the static site's origin via ALLOWED_ORIGIN.
       - type: rewrite
         source: /*
         destination: /index.html
