@@ -448,6 +448,74 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
     color: var(--mute); margin-top: 4px;
   }
 
+  /* contact section header (moved out of the grid) */
+  .contact-head {
+    max-width: 720px;
+    margin-bottom: 48px;
+  }
+  .contact-head .lede {
+    font-size: 16px;
+    color: var(--mute);
+    line-height: 1.6;
+    max-width: 540px;
+    margin: 24px 0 0;
+  }
+
+  /* calendar embed block */
+  .calendar-block {
+    background: var(--paper-warm);
+    border: 1px solid var(--rule);
+    padding: 36px 24px 28px;
+    margin-bottom: 56px;
+  }
+  @media (min-width: 720px) { .calendar-block { padding: 44px 40px 36px; } }
+  .calendar-block h3 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 28px;
+    letter-spacing: -0.012em;
+    line-height: 1.1;
+    margin: 0 0 8px;
+  }
+  .calendar-block .calendar-sub {
+    font-size: 14px;
+    color: var(--mute);
+    margin: 0 0 16px;
+  }
+  .calendar-block .calendarhero-inline-widget {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    margin-top: 16px;
+  }
+
+  /* divider between calendar and form */
+  .contact-divider {
+    position: relative;
+    text-align: center;
+    margin: 0 0 48px;
+  }
+  .contact-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--rule);
+    z-index: 0;
+  }
+  .contact-divider span {
+    position: relative;
+    z-index: 1;
+    background: var(--paper);
+    padding: 0 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
   /* form */
   .form-card {
     background: var(--paper-warm); border: 1px solid var(--rule);
@@ -679,8 +747,9 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
 
 <!-- Contact -->
 <section class="contact" id="contact">
-  <div class="wrap contact-grid">
-    <div class="contact-info">
+  <div class="wrap">
+    <!-- Section header -->
+    <div class="contact-head">
       <span class="meta-label">(02) — Book a call</span>
       <h2 class="section-title">
         Let's grab a <em>virtual coffee.</em>
@@ -689,7 +758,25 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
         Tell us about your situation. We'll assess your options and show you, concretely, what a
         year-round plan would save you in 2026. No cost, no commitment.
       </p>
+    </div>
 
+    <!-- Calendar embed — primary booking path -->
+    <div class="calendar-block">
+      <h3>Pick a time that works for you</h3>
+      <p class="calendar-sub">Choose any open slot below — calls run 30 minutes, via Zoom.</p>
+      <div class="gift-tease">A thank-you gift waits for you on our call</div>
+      <!-- CalendarHero inline embed -->
+      <div class="calendarhero-inline-widget"
+           data-url="https://meeting.calendarhero.com/meeting/new/6a18812b3245190012c29ca2/meeting"
+           style="min-width:320px; height:630px;"></div>
+    </div>
+
+    <!-- Divider -->
+    <div class="contact-divider"><span>Or send us a message</span></div>
+
+    <!-- Contact info + form (fallback path) -->
+    <div class="contact-grid">
+    <div class="contact-info">
       <div class="contact-list">
         <div class="contact-row">
           <div class="k">Phone</div>
@@ -711,9 +798,8 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
     </div>
 
     <form id="lead-form" class="form-card" novalidate>
-      <h3>Book your free consultation</h3>
-      <p class="form-sub">Takes a minute. We respond within one business day.</p>
-      <div class="gift-tease">A thank-you gift waits for you on our call</div>
+      <h3>Tell us your situation first</h3>
+      <p class="form-sub">Prefer to write instead of book? Drop us a note — we'll respond within one business day.</p>
 
       <div class="form-row split">
         <div class="field">
@@ -768,11 +854,12 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
           By submitting, you agree to be contacted by AG FinTax. We never share your details.
         </p>
         <button type="submit" class="btn btn-gold btn-large form-submit">
-          Book free consultation
+          Send message
           <span class="arrow">→</span>
         </button>
       </div>
     </form>
+    </div><!-- /.contact-grid -->
   </div>
 </section>
 
@@ -843,5 +930,7 @@ n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;
 </footer>
 
 <script src="/app.js"></script>
+<!-- CalendarHero inline embed loader -->
+<script type="text/javascript" src="https://app.calendarhero.com/assets/widget.js"></script>
 </body>
 </html>
