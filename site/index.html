@@ -60,7 +60,8 @@
     leadEndpoint: "/api/lead",
     gaMeasurementId: "G-QGHZ6LEB0V",
     saUniversalPixel: "Y1kc0SZIajJ0e7K0jtwhpw",
-    saConversionPixel: ""
+    saConversionPixel: "",
+    clarityProjectId: "x518bx47gq"                    /* Microsoft Clarity — heatmaps + session replay */
   };
 </script>
 
@@ -83,6 +84,18 @@
 <!-- ─── StackAdapt universal pixel (pageview) ────────────────────────────── -->
 <script>!function(s,a,e,v,n,t,z){if(s.saq)return;n=s.saq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!s._saq)s._saq=n;
 n.push=n;n.loaded=!0;n.version='1.0';n.queue=[];t=a.createElement(e);t.async=!0;t.src=v;z=a.getElementsByTagName(e)[0];z.parentNode.insertBefore(t,z)}(window,document,'script','https://tags.srv.stackadapt.com/events.js');saq('ts', window.AGFT_CONFIG.saUniversalPixel);</script>
+
+<!-- ─── Microsoft Clarity (heatmaps, scroll maps, session replay) ────────── -->
+<script>
+  (function (c, l, a, r, i, t, y) {
+    var id = (window.AGFT_CONFIG || {}).clarityProjectId;
+    if (!id) return;                                  /* no-op until project ID is set */
+    c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+    t = l.createElement(r); t.async = 1;
+    t.src = "https://www.clarity.ms/tag/" + id;
+    y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+  })(window, document, "clarity", "script");
+</script>
 
 <style>
   :root {
